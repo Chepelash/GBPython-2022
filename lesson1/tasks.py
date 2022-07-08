@@ -1,7 +1,4 @@
-import sys
-
-
-def task1() -> bool:
+def task1():
     """
     Напишите программу, которая принимает на вход цифру, обозначающую день недели, и проверяет, является ли этот день выходным.
     Пример:
@@ -13,19 +10,18 @@ def task1() -> bool:
         day_number = int(input("Enter number of a day in a week > "))
     except ValueError:
         print("Value must be an integer")
-        return False
+        return
     
     if day_number < 1 or day_number > 7:
         print("Value must be in between 1 and 7 included")
-        return False
+        return
     
     print(f"- {day_number} -> ", end='')
     if day_number < 6:
         print("no")
     else:
         print("yes")
-    return True
-
+    
 
 def task2():
     """
@@ -42,12 +38,11 @@ def task2():
     
 
 def main():
-    print(f"{task1.__name__}...")    
-    if task1():
-        print("Sussess")
-    else:
-        print("Failed")
-    task2()
+    task_list = [task1, task2]
+    for task in task_list:
+        print(f"{task.__name__}...")    
+        task()
+        print("Done\n")    
 
 
 if __name__ == "__main__":
