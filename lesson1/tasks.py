@@ -26,13 +26,28 @@ def task1() -> bool:
         print("yes")
     return True
 
+
+def task2():
+    """
+    изучить понятие Предкатов.
+    """
+    def is_there_something(input:str) -> bool:
+        return bool(input)
+    
+    something = input("Will you enter something? > ")
+    if(is_there_something(something)):
+        print("You did")
+    else:
+        print("You did not")
+    
+
 def main():
     print(f"{task1.__name__}...")    
     if task1():
         print("Sussess")
     else:
         print("Failed")
-
+    task2()
 
 
 if __name__ == "__main__":
