@@ -27,7 +27,22 @@ def task2():
     Пример:
     - пусть N = 4, тогда [ 1, 2, 6, 24 ] (1, 1*2, 1*2*3, 1*2*3*4)
     """
-    pass
+    n_number_str = input("Enter a number N > ")
+    try:
+        n_number = int(n_number_str)
+    except ValueError:
+        print("Wrong input")
+        return
+    
+    print(f"N = {n_number_str} -> [", end="")
+    res = 1
+    for i in range(n_number):
+        res *= i+1
+        print(res, end="")
+        if i < n_number-1:
+            print(", ", end="")
+        else:
+            print("]")
 
 
 def main():
@@ -35,7 +50,7 @@ def main():
     for task in task_list:
         print(f"{task.__name__}...")
         task()
-        print("Done")
+        print("Done\n")
 
 
 if __name__ == "__main__":
