@@ -6,13 +6,14 @@ def task1():
     """Задайте список. Напишите программу, которая определит, присутствует ли в заданном списке строк некое число.
     """
     my_list = [x for x in range(100) if random.randint(0, 1)] + [chr(x) for x in range(100) if random.randint(0, 1)]
+    print(my_list)
     number_to_find_str = input("Enter a number to find > ")
     try:
         number_to_find = int(number_to_find_str)
     except ValueError:
         print("Wrong input")
         return
-    print(f"{number_to_find_str} -> {my_list}")
+    
     if number_to_find in my_list:
         print("It is in")
     else:
