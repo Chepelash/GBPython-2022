@@ -1,5 +1,5 @@
 import random
-
+import string
 
 
 def task1():
@@ -24,7 +24,18 @@ def task1():
 def task2():
     """Напишите программу, которая определит позицию второго вхождения строки в списке либо сообщит, что её нет.
     """
-    pass
+    my_list = [''.join(random.choices(string.ascii_lowercase, k=random.randint(3, 5))) for _ in range(random.randint(0, 7))]
+    if random.randint(0, 5) and len(my_list) != 0:
+        my_list.append(my_list[random.randrange(0, len(my_list))])        
+    print(my_list)
+    
+    string_to_find = input("Enter a string to find second entrance > ")
+    result = 0
+    if my_list.count(string_to_find) < 2:
+        result = -1
+    else:
+        result = my_list.index(string_to_find, my_list.index(string_to_find)+1)
+    print(f"Index = {result}")
 
 
 def task3():
