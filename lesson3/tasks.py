@@ -45,6 +45,9 @@ def task3():
     в формате "слово количество" (см. пример вывода).
     """
     big_string = input("Enter your esse > ")
+    if len(big_string) == 0:
+        print("String is empty")
+        return
     my_dict = dict()
     for word in map(str.lower, big_string.split(" ")):
         if word in my_dict:
