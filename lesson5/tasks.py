@@ -1,5 +1,6 @@
 import os
 import re
+import random
 
 def task1():
     DIGIT_NAME = "digit"
@@ -72,7 +73,96 @@ def task2():
 
 
 def task3():
-    pass
+    GAME_TYPES = ("pvp", "pve")
+    PLAYER_NAME_1 = "player_1"
+    PLAYER_NAME_2 = "player_2"
+    MAX_CANDIES_AT_START = 101
+    MAX_CANDIES_TO_TAKE = 28
+    MAX_FAILED_INPUTS = 3
+    
+    def get_player_order(player_data_1: dict, player_data_2: dict) -> list:
+        result = [player_data_1, player_data_2]
+        random.shuffle(result)
+        return result
+
+    def bot_decision(number_of_candies: int) -> int:
+        if number_of_candies > MAX_CANDIES_TO_TAKE:
+            winning_number = number_of_candies % MAX_CANDIES_TO_TAKE - 1
+            make_decision = lambda x: 1 if x < 1 else x
+            return make_decision(winning_number)            
+        else:
+            return number_of_candies
+        
+
+    def human_decision() -> int:
+        fail_cntr = 0
+        while fail_cntr < MAX_FAILED_INPUTS:
+            candies_taken_input = input("And you took > ")
+            if candies_taken_input.lower() == 'q':
+                return -1
+            try:
+                candies_taken = int(candies_taken_input)
+            except ValueError:
+                print("Wrong input")
+                fail_cntr += 1
+                continue
+            if candies_taken > MAX_CANDIES_TO_TAKE:
+                print(f"Max candies to take per turn = {MAX_CANDIES_TO_TAKE}")
+                fail_cntr += 1
+                continue
+            elif candies_taken < 1:
+                print("You cant take negative number of candies")
+                fail_cntr += 1
+                continue
+            break
+        if fail_cntr == MAX_FAILED_INPUTS:
+            return -2
+        
+        return candies_taken            
+
+    print("Candy game")
+    game_type = input("Choose game type: vs player type 'pvp', vs bot - 'pve' > ")
+    if game_type not in GAME_TYPES:
+        print("Wrong input")
+        return
+    
+    print("Game starts in ", end="")
+    if game_type == 'pvp':
+        pvp = True
+        print("pvp mode")
+    else:
+        pvp = False
+        print("pve mode")
+    
+    is_game_going = True
+    number_of_candies = MAX_CANDIES_AT_START
+    player_data_1 = {"name": PLAYER_NAME_1, "candies": 0, "bot": False}
+    player_data_2 = {"name": PLAYER_NAME_2, "candies": 0, "bot": not pvp}
+    player_list = get_player_order(player_data_1, player_data_2)
+    print(f"First player is {player_list[0]['name']}")
+    while is_game_going:
+        for player in player_list:
+            print(f"There are {number_of_candies}. {player['name']} can take up to {MAX_CANDIES_TO_TAKE}. Or 'q' to exit")
+            if player["bot"]:
+                result = bot_decision(number_of_candies)
+                print(f"Bot took {result} candies...")
+            else:
+                result = human_decision()
+                if result < 0:
+                    if result == -2:
+                        print("You failed at following instructions too many times")
+                        return
+                    elif result == -1:
+                        print("Quitting...")
+                        return
+            if result > number_of_candies:
+                print(f"You took only {number_of_candies} candies...")                
+            number_of_candies -= result            
+            if number_of_candies <= 0:
+                victor = player
+                is_game_going = False
+                break
+    print(f"{victor['name']} has won. Hurray")
 
 
 def main():
