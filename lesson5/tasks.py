@@ -64,7 +64,7 @@ def task1():
                 f.write(f"*x^{el[DEGREE_NAME]}")
             elif el[DEGREE_NAME] == 1:
                 f.write("*x") 
-    print(f"Result was written to {os.path.join(os.path.abspath(), OUT_FILENAME)}")    
+    print(f"Result was written to {os.path.join(os.path.abspath('.'), OUT_FILENAME)}")
 
 
 def task2():
