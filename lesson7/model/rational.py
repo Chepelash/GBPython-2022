@@ -33,7 +33,7 @@ def evaluate(expression: str):
         error_text = "Division by zero"
         raise e(__name__, error_text)
     except Exception as e:
-        error_text = "Fatality"
+        error_text = "Unhandled exception"
         raise Exception(__name__, error_text)
     logger.log_operation(__name__, expression, result)
     return result
