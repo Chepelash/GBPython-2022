@@ -5,74 +5,72 @@ def task1():
     """
     MIN_BOARD_SIZE = 3
     GAME_SYMBOLS = "X", "O"
-    EMPTY_SYMBOL = "_"
+    EMPTY_SYMBOL = "-"
     MAX_FAILED_INPUTS = 3
-    # BOARD_DICT = {"_":}
 
     def print_board(board: list):
-        for line in board:
-            print(line)
+        for i in range(len(board)):
+            print(f" {board[i]} ", end="")
+            if (i+1) % MIN_BOARD_SIZE > 0:
+                print('|', end="")
+            else:
+                print()
+                print(''.join("-" for _ in range(4*MIN_BOARD_SIZE)))                
     
-    def human_decision(board: list) -> tuple:
+    def human_decision(board: list) -> int:
         fail_cntr = 0
         while fail_cntr < MAX_FAILED_INPUTS:
-            coordinates = input(f"Enter x and y separated by space (indexes from 1 to {len(board)}). Or 'q' to quit \n> ")
-            if coordinates.lower() == 'q':
-                return -1, 0
-            coord_list = coordinates.split(" ")
-            if len(coord_list) != 2:
-                print("Wrong input")
-                fail_cntr += 1                
-                continue
-            x, y = coord_list
-            if not str.isdigit(x) or not str.isdigit(y):
-                print("Wrong input")
+            choice = input(f"Enter x and y separated by space (indexes from 1 to {len(board)}). Or 'q' to quit \n> ")
+            if choice.lower() == 'q':
+                return -1
+            if not str.isdigit(choice):
+                print("Wroing input")
                 fail_cntr += 1
                 continue
-            x, y = int(x)-1, int(y)-1
-            if x < 0 or x > len(board)-1 or y < 0 or y > len(board)-1:
+            choice = int(choice)
+
+            if choice < 0 or choice > len(board)-1:
                 print("Wrong index")
                 fail_cntr += 1
                 continue
-            if board[y][x] != EMPTY_SYMBOL:
+            if board[choice] != EMPTY_SYMBOL:
                 print("Cell is not empty")
                 fail_cntr += 1
                 continue
             break
         if fail_cntr == MAX_FAILED_INPUTS:
-            return -2, 0
-        return x, y
+            return -2
+        return choice
 
-    def check_victory(board: list) -> bool:
+    def check_victory(board: list, symb_to_check: str, new_x: int, new_y: int) -> bool:
+        #check left
+        #check right
+        #check up
+        #check down
+        #check NE
+        #check NW
+        #check SE
+        #check SW
         return True
     
     print("tic-tac-toe game")
-    board_size_input = input(f"Enter board size. Minimum size is {MIN_BOARD_SIZE} > ")
-    if not str.isdigit(board_size_input):
-        print("Wrong input")
-        return
-    board_size = int(board_size_input)
-    if board_size < MIN_BOARD_SIZE:
-        print("Size is too small")
-        return
-
-    board = [['_' for _ in range(board_size)] for _ in range(board_size)]
+    board = [EMPTY_SYMBOL for _ in range(MIN_BOARD_SIZE*MIN_BOARD_SIZE)]
     
     is_game_going = True
     while is_game_going:
         for symb in GAME_SYMBOLS:
             print_board(board)
             print(f"{symb} player decision")
-            x, y = human_decision(board)
-            if x < 0:
-                if x == -1:
+            choice = human_decision(board)
+            if choice < 0:
+                if choice == -1:
                     print("Quitting...")
                     return
-                elif x == -2:
+                elif choice == -2:
                     print("You failed at following instructions too many times")
                     return
-            board[y][x] = symb
-            if check_victory(board):
+            board[choice] = symb
+            if check_victory(board, symb):
                 victor = symb
                 is_game_going = False
                 break
