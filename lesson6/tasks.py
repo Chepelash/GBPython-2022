@@ -4,6 +4,7 @@ def task1():
     Создайте программу для игры в "Крестики-нолики".
     """
     MIN_BOARD_SIZE = 3
+    BOARD_SIZE = MIN_BOARD_SIZE * MIN_BOARD_SIZE
     GAME_SYMBOLS = "X", "O"
     EMPTY_SYMBOL = "-"
     MAX_FAILED_INPUTS = 3
@@ -45,23 +46,31 @@ def task1():
             return -2
         return choice
 
-    def check_victory(board: list, symb_to_check: str) -> bool:
-        #check left
-        #check right
-        #check up
-        #check down
-        #check NE
-        #check NW
-        #check SE
-        #check SW
-        return True
+    def check_victory(player_choices: list) -> bool:
+        victory_list = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+        for combination in victory_list: 
+            if all(el in player_choices for el in combination):
+                # Return True if any winning combination is satisfied 
+                return True
+        return False
     
+    def check_tie(players: dict) -> bool:
+        BOARD_SIZE
+        cntr = 0
+        for key in list(players):
+            cntr += len(players[key])
+        if cntr == BOARD_SIZE:
+            return True
+        return False
+
+
     print("tic-tac-toe game")
     print("Board indexes go like this")
     print_board([i+1 for i in range(MIN_BOARD_SIZE*MIN_BOARD_SIZE)])
     board = [EMPTY_SYMBOL for _ in range(MIN_BOARD_SIZE*MIN_BOARD_SIZE)]
     
     print("Starting...")
+    players = {GAME_SYMBOLS[0]: [], GAME_SYMBOLS[1]: []}
     is_game_going = True
     while is_game_going:
         for symb in GAME_SYMBOLS:
@@ -75,10 +84,15 @@ def task1():
                 elif choice == -2:
                     print("You failed at following instructions too many times")
                     return
+            players[symb].append(choice)
             board[choice] = symb
-            if check_victory(board, symb):
+            if check_victory(players[symb]):
                 victor = symb
                 is_game_going = False
+                break
+            if check_tie(players):
+                is_game_going = False
+                victor = "frendship"
                 break
     print_board(board)
     print(f"Victor {victor} symbol gamer, hooray")
