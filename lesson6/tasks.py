@@ -1,5 +1,6 @@
 import os
 import re
+from typing import NamedTuple
 
 
 def task1():
@@ -107,12 +108,87 @@ def task2():
     """
     Напишите программу вычисления арифметического выражения заданного строкой. Используйте операции +,-,/,. приоритет операций стандартный. 
     """
-    equation = input("Enter your equation > ")
-    try:
-        print(f"{equation} => {eval(equation)}")
-    except Exception:
-        print("wrong equation")
-     
+    done = True
+    if not done:
+        equation = input("Enter your equation > ")
+        try:
+            print(f"{equation} => {eval(equation)}")
+        except Exception:
+            print("wrong equation")
+    else:
+        class Token(NamedTuple):
+            type: str
+            value: str
+            position: int
+
+        def pop_items(input_list:list, insert_value:int, index_to_pop:int) -> list:
+            input_list.pop(index_to_pop-1)
+            input_list.pop(index_to_pop-1)
+            input_list.pop(index_to_pop-1)
+            input_list.insert(index_to_pop-1, insert_value)
+            return input_list
+
+        def tokenize(equation: str) -> list:
+            token_specification = [
+                ("NUMBER", r'\d+(\.\d*)?'), #integer or decimal
+                ("OPERATION", r'[+\-*/]'), 
+                ("MISMATCH", r'.')
+            ]
+            tok_regex = "|".join(f"(?P<{pair[0]}>{pair[1]})" for pair in token_specification)
+            output_list = []
+            for el in re.finditer(tok_regex, equation):
+                kind = el.lastgroup
+                # position = el.start()
+                value = el.group()
+                if kind == "NUMBER":
+                    value = float(value) if '.' in value else int(value)
+                elif kind == "MISMATCH":
+                    print(f"Strange value: {value}")
+                    continue
+                output_list.append(value)
+            return output_list
+        
+        equation_input = input("Enter an equation > ")
+        equation_input.replace("\\", "/")
+        result_list = tokenize(equation_input)
+        while True:
+            if result_list.count("*"):
+                operator_index = result_list.index("*")
+                try:
+                    operation_result = result_list[operator_index-1] * result_list[operator_index+1]
+                except IndexError:
+                    print("Wrong equation")
+                    return
+                result_list = pop_items(result_list, operation_result, operator_index)
+                
+            elif result_list.count("/"):
+                operator_index = result_list.index("/")
+                try:
+                    operation_result = result_list[operator_index-1] / result_list[operator_index+1]
+                except IndexError:
+                    print("Wrong equation")
+                    return
+                result_list = pop_items(result_list, operation_result, operator_index)
+            elif result_list.count("+"):
+                operator_index = result_list.index("+")
+                try:
+                    operation_result = result_list[operator_index-1] + result_list[operator_index+1]
+                except IndexError:
+                    print("Wrong equation")
+                    return
+                result_list = pop_items(result_list, operation_result, operator_index)
+            elif result_list.count("-"):
+                operator_index = result_list.index("-")
+                try:
+                    operation_result = result_list[operator_index-1] - result_list[operator_index+1]
+                except IndexError:
+                    print("Wrong equation")
+                    return
+                result_list = pop_items(result_list, operation_result, operator_index)
+
+            if len(result_list) == 1:
+                break
+        print(f"{equation_input} -> {result_list[0]}")
 
 
 def task3():
