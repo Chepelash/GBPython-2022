@@ -15,19 +15,22 @@ def task1():
                 print('|', end="")
             else:
                 print()
-                print(''.join("-" for _ in range(4*MIN_BOARD_SIZE)))                
+                if i+1 < len(board):
+                    print(''.join("-" for _ in range(4*MIN_BOARD_SIZE)))
+                else:
+                    print()
     
     def human_decision(board: list) -> int:
         fail_cntr = 0
         while fail_cntr < MAX_FAILED_INPUTS:
-            choice = input(f"Enter x and y separated by space (indexes from 1 to {len(board)}). Or 'q' to quit \n> ")
+            choice = input(f"Enter an index from 1 to {len(board)}. Or 'q' to quit \n> ")
             if choice.lower() == 'q':
                 return -1
             if not str.isdigit(choice):
                 print("Wroing input")
                 fail_cntr += 1
                 continue
-            choice = int(choice)
+            choice = int(choice) - 1
 
             if choice < 0 or choice > len(board)-1:
                 print("Wrong index")
@@ -42,7 +45,7 @@ def task1():
             return -2
         return choice
 
-    def check_victory(board: list, symb_to_check: str, new_x: int, new_y: int) -> bool:
+    def check_victory(board: list, symb_to_check: str) -> bool:
         #check left
         #check right
         #check up
@@ -54,8 +57,11 @@ def task1():
         return True
     
     print("tic-tac-toe game")
+    print("Board indexes go like this")
+    print_board([i+1 for i in range(MIN_BOARD_SIZE*MIN_BOARD_SIZE)])
     board = [EMPTY_SYMBOL for _ in range(MIN_BOARD_SIZE*MIN_BOARD_SIZE)]
     
+    print("Starting...")
     is_game_going = True
     while is_game_going:
         for symb in GAME_SYMBOLS:
