@@ -1,3 +1,6 @@
+import os
+import re
+
 
 def task1():
     """
@@ -117,7 +120,65 @@ def task3():
     Реализуйте RLE алгоритм: реализуйте модуль сжатия и восстановления данных.
     Входные и выходные данные хранятся в отдельных текстовых файлах.
     """
-    pass
+    ZIP_WM = "ZIP"
+    UNZIP_WM = "UNZIP"
+
+    def rle_zip(input_file_path, output_file_path):
+        with open(input_file_path, 'r') as f:
+            input_text = f.read()
+        current_symb = input_text[0]
+        cntr = 0
+        result_list = []
+        for i in range(len(input_text)):
+            if input_text[i] == current_symb:
+                cntr += 1
+            else:
+                result_list.append((current_symb, cntr))
+                cntr = 1
+                current_symb = input_text[i]
+            if i == len(input_text) - 1:
+                result_list.append((current_symb, cntr))
+        with open(output_file_path, 'w') as o:
+            for el in result_list:
+                o.write(f"{el[0]}{el[1]}")
+
+    def rle_unzip(input_file_path, output_file_path):
+        pattern = r"(\S{1})(\d+)"
+        with open(input_file_path, 'r') as f:
+            file_text = f.read()
+        iter_match = re.finditer(pattern, file_text)
+        with open(output_file_path, 'w') as o:
+            for el in iter_match:
+                for i in range(int(el[2])):
+                    o.write(el[1])
+
+
+    print("RLE")
+    while True:
+        work_mode_input = input("To zip input '1'; to unzip input '2'; 'q' to exit > ")
+        if work_mode_input == 'q':
+            print("Quitting")
+            break
+        elif work_mode_input == '1':
+            work_mode = ZIP_WM
+        elif work_mode_input == '2':
+            work_mode = UNZIP_WM
+        else:
+            print("Wrong input")
+            continue
+
+        input_file_path = input("Enter a path to input file > ")
+        if not os.path.isfile(input_file_path):
+            print("Wrong file path")
+            return
+
+        output_file_path = input("Enter a path to output file > ")        
+        
+        if work_mode == ZIP_WM:
+            rle_zip(input_file_path, output_file_path)
+        elif work_mode == UNZIP_WM:
+            rle_unzip(input_file_path, output_file_path)
+        print("operation is done")
 
 
 def main():
