@@ -32,6 +32,8 @@ def evaluate(expression: str):
     except ZeroDivisionError as e:
         error_text = "Division by zero"
         raise e(__name__, error_text)
+    except ValueError as e:
+        raise e
     except Exception as e:
         error_text = "Unhandled exception"
         raise Exception(__name__, error_text)
