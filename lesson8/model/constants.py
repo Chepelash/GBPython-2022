@@ -1,0 +1,8 @@
+ID_FIELD = "id"
+FIO_FIELD = "fio"
+PHONE_FIELD = "phone"
+DEPARTMENT_FIELD = "department"
+JOB_FIELD = "job"
+ID_WORKER_FIELD = "id_worker"
+ID_JOB_FIELD = "id_job"
+ID_DEPARTMENT_FIELD = "id_department"
