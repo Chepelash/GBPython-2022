@@ -1,9 +1,14 @@
 from logger import logger
-
+from model.constants import *
 
 def get_new_worker_data() -> dict:
     """Get filling data"""
-    raise NotImplementedError(__name__, "Not implemented")
+
+    fio = input("Введите имя работника > ")
+    phone_number = input("Введите телефон работника > ")
+    department = input("Введите департамент работника > ")
+    job = input("Введите должность работника > ")
+    return {FIO_FIELD: fio, PHONE_FIELD: phone_number, DEPARTMENT_FIELD: department, JOB_FIELD: job}    
 
 def get_worker_to_remove() -> str:
     """Get worker id"""
