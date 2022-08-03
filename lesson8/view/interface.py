@@ -67,7 +67,7 @@ u - перейти в меню выше
 
     def job_menu():
         sub_menu_input = ""
-        while sub_menu_input.lower != 'u':
+        while sub_menu_input.lower() != 'u':
             print()
             print("Меню работы с должностями")
             print("""Введите операцию
