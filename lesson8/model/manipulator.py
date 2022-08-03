@@ -2,6 +2,8 @@ import os
 import csv
 from collections import OrderedDict
 
+from model.constants import *
+
 
 ASSIGNMENT_FILE_PATH = os.path.join("config", 'assignments.csv')
 DEPARTMENT_FILE_PATH = os.path.join("config", 'departments.csv')
@@ -9,14 +11,64 @@ JOBS_FILE_PATH = os.path.join("config", 'jobs.csv')
 WORKERS_FILE_PATH = os.path.join("config", 'workers.csv')
 
 CSV_DELIMITERS = ";"
-ID_FIELD = "id"
-FIO_FIELD = "fio"
-PHONE_FIELD = "phone"
-DEPARTMENT_FIELD = "department"
-JOB_FIELD = "job"
-ID_WORKER_FIELD = "id_worker"
-ID_JOB_FIELD = "id_job"
-ID_DEPARTMENT_FIELD = "id_department"
+CSV_WORKER_FIELDNAMES = ID_FIELD, FIO_FIELD, PHONE_FIELD
+CSV_DEPARTMENT_FIELDNAMES = ID_FIELD, DEPARTMENT_FIELD
+CSV_JOB_FIELDNAMES = ID_FIELD, JOB_FIELD
+CSV_ASSIGNMENT_FIELDNAMES = ID_WORKER_FIELD, ID_DEPARTMENT_FIELD, ID_JOB_FIELD
+# ID_FIELD = "id"
+# FIO_FIELD = "fio"
+# PHONE_FIELD = "phone"
+# DEPARTMENT_FIELD = "department"
+# JOB_FIELD = "job"
+# ID_WORKER_FIELD = "id_worker"
+# ID_JOB_FIELD = "id_job"
+# ID_DEPARTMENT_FIELD = "id_department"
+
+
+def get_department_id(department: str):
+    if not os.path.isfile(DEPARTMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(DEPARTMENT_FILE_PATH, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
+        for line in csv_reader:
+            if line[DEPARTMENT_FIELD] == department:
+                return line[ID_FIELD]
+    return -1
+
+
+def get_worker_id(worker: str):
+    if not os.path.isfile(WORKERS_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(WORKERS_FILE_PATH, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
+        for line in csv_reader:
+            if line[FIO_FIELD] == worker:
+                return line[ID_FIELD]
+    return -1
+
+
+def get_job_id(job: str):
+    if not os.path.isfile(JOBS_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(JOBS_FILE_PATH, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
+        for line in csv_reader:
+            if line[JOB_FIELD] == job:
+                return line[ID_FIELD]
+    return -1
+
+
+def get_next_available_worker_id() -> str:
+    ids = []
+    with open(WORKERS_FILE_PATH, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
+        for line in csv_reader:
+            ids.append(line[ID_FIELD])
+    ids_int = list(map(int, ids))
+    if max(ids_int) == len(ids_int):
+        return str(len(ids) + 1)
+    worker_id_list = sorted(set(range(1, max(ids_int) + 1)).difference(ids_int))
+    return str(worker_id_list[0])
 
 
 def show_all_workers() -> dict:
@@ -50,7 +102,22 @@ def show_all_workers() -> dict:
 
 
 def add_new_worker(data: dict):
-    raise NotImplementedError(__name__, "Not implemented")
+    department_id = get_department_id(data[DEPARTMENT_FIELD])
+    job_id = get_job_id(data[JOB_FIELD])
+    if department_id == -1 or job_id == -1:
+        raise ValueError(__name__, "No such department or job")
+    worker_id = get_next_available_worker_id()
+    if not os.path.isfile(WORKERS_FILE_PATH) or not os.path.isfile(ASSIGNMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(WORKERS_FILE_PATH, 'a') as worker_file, open(ASSIGNMENT_FILE_PATH, 'a') as ass_file:
+        csv_writer = csv.DictWriter(worker_file, fieldnames=CSV_WORKER_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writerow({ID_FIELD: worker_id, FIO_FIELD: data[FIO_FIELD], PHONE_FIELD: data[PHONE_FIELD]})
+        
+        csv_writer = csv.DictWriter(ass_file,fieldnames=CSV_ASSIGNMENT_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writerow({ID_WORKER_FIELD: worker_id, ID_DEPARTMENT_FIELD: department_id, ID_JOB_FIELD: job_id})
+
+    return {ID_FIELD: worker_id, FIO_FIELD: data[FIO_FIELD], PHONE_FIELD: data[PHONE_FIELD], 
+            DEPARTMENT_FIELD: data[DEPARTMENT_FIELD], JOB_FIELD: data[JOB_FIELD]}
 
 
 def remove_worker(worker_id: str):
