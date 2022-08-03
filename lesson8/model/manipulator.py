@@ -10,6 +10,11 @@ DEPARTMENT_FILE_PATH = os.path.join("config", 'departments.csv')
 JOBS_FILE_PATH = os.path.join("config", 'jobs.csv')
 WORKERS_FILE_PATH = os.path.join("config", 'workers.csv')
 
+ASSIGNMENT_EDITED_FILE_PATH = os.path.join("config", 'assignments_edited.csv')
+DEPARTMENT_EDITED_FILE_PATH = os.path.join("config", 'departments_edited.csv')
+JOBS_EDITED_FILE_PATH = os.path.join("config", 'jobs_edited.csv')
+WORKERS_EDITED_FILE_PATH = os.path.join("config", 'workers_edited.csv')
+
 CSV_DELIMITERS = ";"
 CSV_WORKER_FIELDNAMES = ID_FIELD, FIO_FIELD, PHONE_FIELD
 CSV_DEPARTMENT_FIELDNAMES = ID_FIELD, DEPARTMENT_FIELD
@@ -120,8 +125,28 @@ def add_new_worker(data: dict):
             DEPARTMENT_FIELD: data[DEPARTMENT_FIELD], JOB_FIELD: data[JOB_FIELD]}
 
 
-def remove_worker(worker_id: str):
-    raise NotImplementedError(__name__, "Not implemented")
+def remove_worker(worker_fio: str):
+    worker_id = get_worker_id(worker_fio)
+    if worker_id == -1:
+        raise ValueError(__name__, "Worker does not exists")
+    if not os.path.isfile(WORKERS_FILE_PATH) or not os.path.isfile(ASSIGNMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(WORKERS_FILE_PATH, 'r', newline="") as worker_file, open(ASSIGNMENT_FILE_PATH, 'r', newline='') as ass_file, \
+         open(WORKERS_EDITED_FILE_PATH, 'w', newline='') as worker_edited_file, open(ASSIGNMENT_EDITED_FILE_PATH, 'w', newline='') as ass_edited_file:
+        csv_reader = csv.DictReader(worker_file, delimiter=CSV_DELIMITERS)
+        csv_writer = csv.DictWriter(worker_edited_file, fieldnames=CSV_WORKER_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writeheader()
+        for line in csv_reader:
+            if line[ID_FIELD] != worker_id:
+                csv_writer.writerow(line)
+        csv_reader = csv.DictReader(ass_file, delimiter=CSV_DELIMITERS)
+        csv_writer = csv.DictWriter(ass_edited_file, fieldnames=CSV_ASSIGNMENT_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writeheader()
+        for line in csv_reader:
+            if line[ID_WORKER_FIELD] != worker_id:
+                csv_writer.writerow(line)
+    os.replace(WORKERS_EDITED_FILE_PATH, WORKERS_FILE_PATH)
+    os.replace(ASSIGNMENT_EDITED_FILE_PATH, ASSIGNMENT_FILE_PATH)
 
 
 def edit_worker(data: dict):
