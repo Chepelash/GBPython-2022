@@ -12,7 +12,8 @@ def get_new_worker_data() -> dict:
 
 def get_worker_to_remove() -> str:
     """Get worker id"""
-    raise NotImplementedError(__name__, "Not implemented")
+    data = input("Введите ФИО работника > ")
+    return data    
 
 def get_edited_worker_data() -> dict:
     raise NotImplementedError(__name__, "Not implemented")
@@ -23,7 +24,9 @@ def get_new_department_data() -> dict:
 
 def get_department_to_remove() -> str:
     """Get department id"""
-    raise NotImplementedError(__name__, "Not implemented")
+    data = input("Введите название департамента > ")
+    return data
+    
 
 def get_edited_department_data() -> dict:
     raise NotImplementedError(__name__, "Not implemented")
@@ -34,7 +37,9 @@ def get_new_job_data() -> dict:
 
 def get_job_to_remove() -> str:
     """Get job id"""
-    raise NotImplementedError(__name__, "Not implemented")
+    data = input("Введите название должности > ")
+    return data
+    
 
 def get_edited_job_data() -> dict:
     raise NotImplementedError(__name__, "Not implemented")
