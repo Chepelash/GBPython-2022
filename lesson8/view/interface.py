@@ -12,7 +12,7 @@ h - вывести этот текст
 
     def worker_menu():
         sub_menu_input = ""
-        while sub_menu_input.lower != 'u':
+        while sub_menu_input.lower() != 'u':
             print()
             print("Меню работы с работниками")
             print("""Введите операцию
@@ -40,7 +40,7 @@ u - перейти в меню выше
 
     def department_menu():
         sub_menu_input = ""
-        while sub_menu_input.lower != 'u':
+        while sub_menu_input.lower() != 'u':
             print()
             print("Меню работы с отделами")
             print("""Введите операцию
@@ -120,7 +120,7 @@ q - выйти из программы""")
             interpreter.export_table(controller.export_table)
         elif user_input.lower() == 'h':
             print(HELP_TEXT)
-        elif user_input.lower == 'q':
+        elif user_input.lower() == 'q':
             print("Выход из программы.")
         else:
             print("Неизвестная команда")
