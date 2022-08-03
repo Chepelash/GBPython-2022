@@ -28,7 +28,7 @@ CSV_ASSIGNMENT_FIELDNAMES = ID_WORKER_FIELD, ID_DEPARTMENT_FIELD, ID_JOB_FIELD
 def get_department_id(department: str):
     if not os.path.isfile(DEPARTMENT_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
-    with open(DEPARTMENT_FILE_PATH, 'r') as csv_file:
+    with open(DEPARTMENT_FILE_PATH, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             if line[DEPARTMENT_FIELD] == department:
@@ -39,7 +39,7 @@ def get_department_id(department: str):
 def get_worker_id(worker: str):
     if not os.path.isfile(WORKERS_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
-    with open(WORKERS_FILE_PATH, 'r') as csv_file:
+    with open(WORKERS_FILE_PATH, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             if line[FIO_FIELD] == worker:
@@ -50,7 +50,7 @@ def get_worker_id(worker: str):
 def get_job_id(job: str):
     if not os.path.isfile(JOBS_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
-    with open(JOBS_FILE_PATH, 'r') as csv_file:
+    with open(JOBS_FILE_PATH, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             if line[JOB_FIELD] == job:
@@ -60,7 +60,7 @@ def get_job_id(job: str):
 
 def get_next_available_worker_id() -> str:
     ids = []
-    with open(WORKERS_FILE_PATH, 'r') as csv_file:
+    with open(WORKERS_FILE_PATH, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             ids.append(line[ID_FIELD])
@@ -76,11 +76,11 @@ def show_all_workers() -> dict:
     or not os.path.isfile(DEPARTMENT_FILE_PATH) or not os.path.isfile(ASSIGNMENT_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
     result_dict = {}
-    with open(WORKERS_FILE_PATH, 'r') as f:
+    with open(WORKERS_FILE_PATH, 'r', newline="") as f:
         csv_reader = csv.DictReader(f, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             result_dict[line[ID_FIELD]] = OrderedDict({ID_FIELD: line[ID_FIELD], FIO_FIELD: line[FIO_FIELD], PHONE_FIELD: line[PHONE_FIELD]})
-    with open(ASSIGNMENT_FILE_PATH, 'r') as ass_file, open(JOBS_FILE_PATH, 'r') as jobs_file, open(DEPARTMENT_FILE_PATH, 'r') as dep_file:
+    with open(ASSIGNMENT_FILE_PATH, 'r', newline="") as ass_file, open(JOBS_FILE_PATH, 'r', newline="") as jobs_file, open(DEPARTMENT_FILE_PATH, 'r', newline="") as dep_file:
         ass_reader = csv.DictReader(ass_file, delimiter=CSV_DELIMITERS)
         jobs_reader = csv.DictReader(jobs_file, delimiter=CSV_DELIMITERS)
         dep_reader = csv.DictReader(dep_file, delimiter=CSV_DELIMITERS)
@@ -109,7 +109,7 @@ def add_new_worker(data: dict):
     worker_id = get_next_available_worker_id()
     if not os.path.isfile(WORKERS_FILE_PATH) or not os.path.isfile(ASSIGNMENT_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
-    with open(WORKERS_FILE_PATH, 'a') as worker_file, open(ASSIGNMENT_FILE_PATH, 'a') as ass_file:
+    with open(WORKERS_FILE_PATH, 'a') as worker_file, open(ASSIGNMENT_FILE_PATH, 'a', newline="") as ass_file:
         csv_writer = csv.DictWriter(worker_file, fieldnames=CSV_WORKER_FIELDNAMES, delimiter=CSV_DELIMITERS)
         csv_writer.writerow({ID_FIELD: worker_id, FIO_FIELD: data[FIO_FIELD], PHONE_FIELD: data[PHONE_FIELD]})
         
@@ -132,7 +132,7 @@ def show_all_departments() -> dict:
     if not os.path.isfile(DEPARTMENT_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
     result_dict = {}
-    with open(DEPARTMENT_FILE_PATH, 'r') as csv_file:
+    with open(DEPARTMENT_FILE_PATH, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             result_dict[line[ID_FIELD]] = OrderedDict({ID_FIELD: line[ID_FIELD], DEPARTMENT_FIELD: line[DEPARTMENT_FIELD]})
@@ -155,7 +155,7 @@ def show_all_jobs():
     if not os.path.isfile(JOBS_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
     result_dict = {}
-    with open(JOBS_FILE_PATH, 'r') as csv_file:
+    with open(JOBS_FILE_PATH, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             result_dict[line[ID_FIELD]] = OrderedDict({ID_FIELD: line[ID_FIELD], JOB_FIELD: line[JOB_FIELD]})
