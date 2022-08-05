@@ -1,4 +1,5 @@
 import os
+import shutil
 import csv
 from collections import OrderedDict
 
@@ -55,17 +56,17 @@ def get_job_id(job: str):
     return -1
 
 
-def get_next_available_worker_id() -> str:
+def get_next_available_id(fpath: str) -> str:
     ids = []
-    with open(WORKERS_FILE_PATH, 'r', newline="") as csv_file:
+    with open(fpath, 'r', newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
         for line in csv_reader:
             ids.append(line[ID_FIELD])
     ids_int = list(map(int, ids))
     if max(ids_int) == len(ids_int):
         return str(len(ids) + 1)
-    worker_id_list = sorted(set(range(1, max(ids_int) + 1)).difference(ids_int))
-    return str(worker_id_list[0])
+    id_list = sorted(set(range(1, max(ids_int) + 1)).difference(ids_int))
+    return str(id_list[0])
 
 
 def show_all_workers() -> dict:
@@ -103,7 +104,7 @@ def add_new_worker(data: dict):
     job_id = get_job_id(data[JOB_FIELD])
     if department_id == -1 or job_id == -1:
         raise ValueError(__name__, "No such department or job")
-    worker_id = get_next_available_worker_id()
+    worker_id = get_next_available_id(WORKERS_FILE_PATH)
     if not os.path.isfile(WORKERS_FILE_PATH) or not os.path.isfile(ASSIGNMENT_FILE_PATH):
         raise FileNotFoundError(__name__, "BD files not found")
     with open(WORKERS_FILE_PATH, 'a') as worker_file, open(ASSIGNMENT_FILE_PATH, 'a', newline="") as ass_file:
@@ -156,8 +157,17 @@ def show_all_departments() -> dict:
     return result_dict
 
 
-def add_new_department(data: dict):
-    raise NotImplementedError(__name__, "Not implemented")
+def add_new_department(data: str):
+    if get_department_id(data) != -1:
+        raise ValueError(__name__, "Job exists")
+    if not os.path.isfile(DEPARTMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    dep_next_id = get_next_available_id(DEPARTMENT_FILE_PATH)
+    row = {ID_FIELD: dep_next_id, JOB_FIELD: data}
+    with open(DEPARTMENT_FILE_PATH, 'a', newline="") as csv_file:
+        csv_writer = csv.DictWriter(csv_file, fieldnames=CSV_DEPARTMENT_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writerow(row)
+    return row    
 
 
 def remove_department(department_id: str):
@@ -165,7 +175,24 @@ def remove_department(department_id: str):
 
 
 def edit_department(data: dict):
-    raise NotImplementedError(__name__, "Not implemented")
+    dep_id = get_job_id(data[OLD_VALUE])
+    if dep_id == -1:
+        raise ValueError(__name__, "Department does not exists")
+    if not os.path.isfile(DEPARTMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(DEPARTMENT_FILE_PATH, 'r', newline="") as deps_file, open(DEPARTMENT_EDITED_FILE_PATH, 'w', newline="") as deps_edited_file:
+        csv_reader = csv.DictReader(deps_file, delimiter=CSV_DELIMITERS)
+        csv_writer = csv.DictWriter(deps_edited_file, fieldnames=CSV_DEPARTMENT_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writeheader()
+        for line in csv_reader:
+            if line[ID_FIELD] == dep_id:
+                new_line = line.copy()
+                new_line[DEPARTMENT_FIELD] = data[NEW_VALUE]
+                csv_writer.writerow(new_line)
+            else:
+                csv_writer.writerow(line)
+    os.replace(DEPARTMENT_EDITED_FILE_PATH, DEPARTMENT_FILE_PATH)
+    return {ID_FIELD: dep_id, DEPARTMENT_FIELD: data[NEW_VALUE]}
 
 
 def show_all_jobs():
@@ -179,8 +206,17 @@ def show_all_jobs():
     return result_dict
 
 
-def add_new_job(data: dict):
-    raise NotImplementedError(__name__, "Not implemented")
+def add_new_job(data: str):
+    if get_job_id(data) != -1:
+        raise ValueError(__name__, "Job exists")
+    if not os.path.isfile(JOBS_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    job_next_id = get_next_available_id(JOBS_FILE_PATH)
+    row = {ID_FIELD: job_next_id, JOB_FIELD: data}
+    with open(JOBS_FILE_PATH, 'a', newline="") as csv_file:
+        csv_writer = csv.DictWriter(csv_file, fieldnames=CSV_JOB_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writerow(row)
+    return row    
 
 
 def remove_job(job_id: str):
@@ -188,16 +224,64 @@ def remove_job(job_id: str):
 
 
 def edit_job(data: dict):
-    raise NotImplementedError(__name__, "Not implemented")
+    job_id = get_job_id(data[OLD_VALUE])
+    if job_id == -1:
+        raise ValueError(__name__, "Job does not exists")
+    if not os.path.isfile(JOBS_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(JOBS_FILE_PATH, 'r', newline="") as jobs_file, open(JOBS_EDITED_FILE_PATH, 'w', newline="") as jobs_edited_file:
+        csv_reader = csv.DictReader(jobs_file, delimiter=CSV_DELIMITERS)
+        csv_writer = csv.DictWriter(jobs_edited_file, fieldnames=CSV_JOB_FIELDNAMES, delimiter=CSV_DELIMITERS)
+        csv_writer.writeheader()
+        for line in csv_reader:
+            if line[ID_FIELD] == job_id:
+                new_line = line.copy()
+                new_line[JOB_FIELD] = data[NEW_VALUE]
+                csv_writer.writerow(new_line)
+            else:
+                csv_writer.writerow(line)
+    os.replace(JOBS_EDITED_FILE_PATH, JOBS_FILE_PATH)
+    return {ID_FIELD: job_id, JOB_FIELD: data[NEW_VALUE]}
 
 
-def validate_tables(data: tuple) -> bool:
-    raise NotImplementedError(__name__, "Not implemented")
+def validate_tables(data: dict) -> bool:
+    def find_id(reader, id):
+        for line in reader:
+            if line[ID_FIELD] == id:
+                return True
+        return False
+
+    if not os.path.isfile(data[VALIDATE_ASS_KEY]) or not os.path.isfile(data[VALIDATE_DEP_KEY]) or \
+       not os.path.isfile(data[VALIDATE_JOB_KEY]) or not os.path.isfile(data[VALIDATE_WORK_KEY]) :
+       raise FileNotFoundError(__name__, "Files not found")
+    with open(data[VALIDATE_ASS_KEY], 'r', newline="") as ass_file, open(data[VALIDATE_DEP_KEY], 'r', newline="") as dep_file, \
+         open(data[VALIDATE_JOB_KEY], 'r', newline="") as job_file, open(data[VALIDATE_WORK_KEY], 'r', newline="") as work_file:
+         ass_reader = csv.DictReader(ass_file, delimiter=CSV_DELIMITERS)
+         dep_reader = csv.DictReader(dep_file, delimiter=CSV_DELIMITERS)
+         job_reader = csv.DictReader(job_file, delimiter=CSV_DELIMITERS)
+         work_reader = csv.DictReader(work_file, delimiter=CSV_DELIMITERS)
+         for line in ass_reader:
+            if not any(find_id(dep_reader, line[ID_DEPARTMENT_FIELD]), find_id(job_reader, line[ID_JOB_FIELD]),
+            find_id(work_reader, line[ID_WORKER_FIELD])):
+                return False
+    return True
 
 
-def import_table(data: tuple) -> bool:
-    raise NotImplementedError(__name__, "Not implemented")
+def import_table(data: dict) -> bool:
+    if not validate_tables(data):
+        raise ValueError(__name__, "Tables are not valid")
+    shutil.copy2(data[VALIDATE_ASS_KEY], ASSIGNMENT_FILE_PATH)
+    shutil.copy2(data[VALIDATE_DEP_KEY], DEPARTMENT_FILE_PATH)
+    shutil.copy2(data[VALIDATE_JOB_KEY], JOBS_FILE_PATH)
+    shutil.copy2(data[VALIDATE_WORK_KEY], WORKERS_FILE_PATH)
+    return True    
 
 
 def export_table(data: str) -> tuple:
-    raise NotImplementedError(__name__, "Not implemented")
+    dst_list = []
+    dst_list.append(shutil.copy2(data[VALIDATE_ASS_KEY], ASSIGNMENT_FILE_PATH))
+    dst_list.append(shutil.copy2(data[VALIDATE_DEP_KEY], DEPARTMENT_FILE_PATH))
+    dst_list.append(shutil.copy2(data[VALIDATE_JOB_KEY], JOBS_FILE_PATH))
+    dst_list.append(shutil.copy2(data[VALIDATE_WORK_KEY], WORKERS_FILE_PATH))
+    return tuple(dst_list)
+    

@@ -20,7 +20,8 @@ def get_edited_worker_data() -> dict:
 
 def get_new_department_data() -> dict:
     """Get filling data"""
-    raise NotImplementedError(__name__, "Not implemented")
+    new_dep_name = input("Введите название нового отдела > ")
+    return new_dep_name
 
 def get_department_to_remove() -> str:
     """Get department id"""
@@ -29,11 +30,14 @@ def get_department_to_remove() -> str:
     
 
 def get_edited_department_data() -> dict:
-    raise NotImplementedError(__name__, "Not implemented")
+    old_dep_name = input("Введите старое название отдела > ")
+    new_dep_name = input("Введите новое название отдела > ")
+    return {OLD_VALUE: old_dep_name, NEW_VALUE: new_dep_name}
 
-def get_new_job_data() -> dict:
+def get_new_job_data() -> str:
     """Get filling data"""
-    raise NotImplementedError(__name__, "Not implemented")
+    new_job_name = input("Введите название новой должности > ")
+    return new_job_name
 
 def get_job_to_remove() -> str:
     """Get job id"""
@@ -42,12 +46,21 @@ def get_job_to_remove() -> str:
     
 
 def get_edited_job_data() -> dict:
-    raise NotImplementedError(__name__, "Not implemented")
+    old_job_name = input("Введите старое название профессии > ")
+    new_job_name = input("Введите новое название профессии > ")
+    return {OLD_VALUE: old_job_name, NEW_VALUE: new_job_name}
 
-def get_import_data() -> tuple:
+def get_import_data() -> dict:
     """Get paths to csv files"""
-    raise NotImplementedError(__name__, "Not implemented")
+    data = {}
+    data[VALIDATE_ASS_KEY] = input("Введите путь к файлу назначений > ")
+    data[VALIDATE_DEP_KEY] = input("Введите путь к файлу отделов > ")
+    data[VALIDATE_JOB_KEY] = input("Введите путь к файлу должностей > ")
+    data[VALIDATE_WORK_KEY] = input("Введите путь к файлу работников > ")
+    return data
+    
 
 def get_export_data() -> str:
     """Get dir to write csv files"""
-    raise NotImplementedError(__name__, "Not implemented")
+    data = input("Введите папку для экспорта")
+    return data
