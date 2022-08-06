@@ -143,7 +143,58 @@ def remove_worker(worker_fio: str):
 
 
 def edit_worker(data: dict):
-    raise NotImplementedError(__name__, "Not implemented")
+    worker_id = get_worker_id(data[OLD_VALUE])
+    if worker_id == -1:
+        raise ValueError(__name__, "Worker does not exists")
+    change_worker = False
+    change_ass = False
+    if data[FIO_FIELD] or data[PHONE_FIELD]:
+        change_worker = True
+    if data[JOB_FIELD] or data[DEPARTMENT_FIELD]:
+        change_ass = True
+    if not any((change_ass, change_worker)):
+        raise ValueError(__name__, "All fields are empty")
+    
+    if not os.path.isfile(WORKERS_FILE_PATH) or not os.path.isfile(ASSIGNMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    with open(WORKERS_FILE_PATH, 'r', newline="") as worker_file, open(ASSIGNMENT_FILE_PATH, 'r', newline='') as ass_file, \
+        open(WORKERS_EDITED_FILE_PATH, 'w', newline='') as worker_edited_file, open(ASSIGNMENT_EDITED_FILE_PATH, 'w', newline='') as ass_edited_file:
+        worker_reader = csv.DictReader(worker_file, delimiter=CSV_DELIMITERS)
+        ass_reader = csv.DictReader(ass_file, delimiter=CSV_DELIMITERS)
+        if change_worker:
+            csv_edit_writer = csv.DictWriter(worker_edited_file, fieldnames=CSV_WORKER_FIELDNAMES, delimiter=CSV_DELIMITERS)
+            csv_edit_writer.writeheader()
+            for line in worker_reader:
+                if line[ID_FIELD] == worker_id:
+                    new_line = line.copy()
+                    if data[FIO_FIELD]:
+                        new_line[FIO_FIELD] = data[FIO_FIELD]
+                    if data[PHONE_FIELD]:
+                        new_line[PHONE_FIELD] = data[PHONE_FIELD]
+                    csv_edit_writer.writerow(new_line)
+                else:
+                    csv_edit_writer.writerow(line)
+        if change_ass:
+            csv_edit_writer = csv.DictWriter(ass_edited_file, fieldnames=CSV_ASSIGNMENT_FIELDNAMES, delimiter=CSV_DELIMITERS)
+            csv_edit_writer.writeheader()
+            for line in ass_reader:
+                if line[ID_WORKER_FIELD] == worker_id:
+                    new_line = line.copy()
+                    if data[JOB_FIELD]:
+                        new_line[ID_JOB_FIELD] = data[JOB_FIELD]
+                    if data[DEPARTMENT_FIELD]:
+                        new_line[ID_DEPARTMENT_FIELD] = data[DEPARTMENT_FIELD]
+                    csv_edit_writer.writerow(new_line)
+                else:
+                    csv_edit_writer.writerow(line)
+    if change_ass:
+        os.replace(ASSIGNMENT_EDITED_FILE_PATH, ASSIGNMENT_FILE_PATH)
+    if change_worker:
+        os.replace(WORKERS_EDITED_FILE_PATH, WORKERS_FILE_PATH)
+    if os.path.isfile(WORKERS_EDITED_FILE_PATH):
+        os.remove(WORKERS_EDITED_FILE_PATH)
+    if os.path.isfile(ASSIGNMENT_EDITED_FILE_PATH):
+        os.remove(ASSIGNMENT_EDITED_FILE_PATH)
 
 
 def show_all_departments() -> dict:
@@ -261,8 +312,8 @@ def validate_tables(data: dict) -> bool:
          job_reader = csv.DictReader(job_file, delimiter=CSV_DELIMITERS)
          work_reader = csv.DictReader(work_file, delimiter=CSV_DELIMITERS)
          for line in ass_reader:
-            if not any(find_id(dep_reader, line[ID_DEPARTMENT_FIELD]), find_id(job_reader, line[ID_JOB_FIELD]),
-            find_id(work_reader, line[ID_WORKER_FIELD])):
+            if not any((find_id(dep_reader, line[ID_DEPARTMENT_FIELD]), find_id(job_reader, line[ID_JOB_FIELD]),
+            find_id(work_reader, line[ID_WORKER_FIELD]))):
                 return False
     return True
 
@@ -279,9 +330,9 @@ def import_table(data: dict) -> bool:
 
 def export_table(data: str) -> tuple:
     dst_list = []
-    dst_list.append(shutil.copy2(data[VALIDATE_ASS_KEY], ASSIGNMENT_FILE_PATH))
-    dst_list.append(shutil.copy2(data[VALIDATE_DEP_KEY], DEPARTMENT_FILE_PATH))
-    dst_list.append(shutil.copy2(data[VALIDATE_JOB_KEY], JOBS_FILE_PATH))
-    dst_list.append(shutil.copy2(data[VALIDATE_WORK_KEY], WORKERS_FILE_PATH))
+    dst_list.append(shutil.copy2(ASSIGNMENT_FILE_PATH, data))
+    dst_list.append(shutil.copy2(DEPARTMENT_FILE_PATH, data))
+    dst_list.append(shutil.copy2(JOBS_FILE_PATH, data))
+    dst_list.append(shutil.copy2(WORKERS_FILE_PATH, data))
     return tuple(dst_list)
     
