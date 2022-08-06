@@ -9,6 +9,10 @@ def log_operation(module_name: str, request: str, result: Any):
     with open(PATH_TO_LOG_FILE, 'a') as f:
         f.write(f"{dt.now().strftime(DATETIME_FORMAT)} {module_name}: Request: {request} -> {result}\n")
 
+def log_operation(module_name: str, request: str):
+    with open(PATH_TO_LOG_FILE, 'a') as f:
+        f.write(f"{dt.now().strftime(DATETIME_FORMAT)} {module_name}: Request: {request}\n")
+
 def log_error(module_name: str, error_text: str):
     with open(PATH_TO_LOG_FILE, 'a') as f:
         f.write(f"{dt.now().strftime(DATETIME_FORMAT)} {module_name}: Exception: {error_text}\n")

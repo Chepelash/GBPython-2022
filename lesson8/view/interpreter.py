@@ -24,7 +24,8 @@ def show_dict_data(controller_function: FunctionType):
         return
     for v in data.values():
         print(" ".join(list(v.values())))
-        
+    logger.log_operation(__name__, controller_function.__name__)
+
 
 def import_table(controller_function: FunctionType):
     try:
@@ -42,6 +43,7 @@ def import_table(controller_function: FunctionType):
         print("Неизвестная ошибка")
         return
     print("OK")
+    logger.log_operation(__name__, controller_function.__name__)
 
 
 def export_table(controller_function: FunctionType):
@@ -61,3 +63,4 @@ def export_table(controller_function: FunctionType):
         return
     for line in data:
         print(line)
+    logger.log_operation(__name__, controller_function.__name__)
