@@ -51,6 +51,10 @@ def export_table(controller_function: FunctionType):
         logger.log_error(e.args[0], e.args[1])
         print("Не сделано")
         return
+    except ValueError as e:
+        logger.log_error(e.args[0], e.args[1])
+        print("Папка не существует")
+        return
     except Exception as e:
         logger.log_error(__name__, e)
         print("Неизвестная ошибка")

@@ -329,6 +329,8 @@ def import_table(data: dict) -> bool:
 
 
 def export_table(data: str) -> tuple:
+    if not os.path.isdir():
+        raise ValueError(__name__, "Directory does not excists")
     dst_list = []
     dst_list.append(shutil.copy2(ASSIGNMENT_FILE_PATH, data))
     dst_list.append(shutil.copy2(DEPARTMENT_FILE_PATH, data))
