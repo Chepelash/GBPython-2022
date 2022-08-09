@@ -9,10 +9,10 @@ def bot_loop():
         controller.start_bot()
     except FileNotFoundError as e:
         print("Cannot find credential file. Should be in credentials.txt")
-        logger.error(e)
+        logger.error("%s %s", __name__, e.strerror)
     except TypeError as e:
-        logger.error(e)
+        logger.error("%s %s", __name__, e.strerror)
         print("Json")
     except Exception as e:
-        logger.error(e)
+        logger.error("%s %s", __name__, e.strerror)
         print(e)
