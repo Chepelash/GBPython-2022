@@ -10,16 +10,21 @@ HELP_TEXT = """Commands:
 /hello - say hello
 /rps <rock, paper, scissors> - play rock paper scissors"""
 
+logger = logging.getLogger("my_logger")
 
 def show_help(update: Update, context: CallbackContext):
+    logger.debug("Help command")
     update.message.reply_text(HELP_TEXT)
 
 
 def hello_name(update: Update, context: CallbackContext):
+    logger.debug("Hello command")
     update.message.reply_text(f"Hello, {update.effective_user.first_name}")
 
 
 def play_rps(update: Update, context: CallbackContext):
+    logger.debug("RPS command")
+    
     possible_actions = ["rock", "paper", "scissors"]
     computer_action = random.choice(possible_actions)
     user_action = context.args[0]
