@@ -13,7 +13,7 @@ from telegram.ext import (
 )
 
 import state_constants as sc
-
+import manipulator
 #states
 (
     START_MENU, 
@@ -25,7 +25,15 @@ import state_constants as sc
 
 # functions
 def show_all_workers(update: Update, context: CallbackContext):
-    text = "Works"
+    try:
+        data = manipulator.show_all_workers()
+    except Exception:
+        text = "Error =("
+    else:
+        text = ""
+        for v in data.values():
+            text += " ".join(list(v.values())) + '\n'
+        
     buttons = [[InlineKeyboardButton("Назад", callback_data=BACK)]]
     keyboard = InlineKeyboardMarkup(buttons)
     update.callback_query.answer()    
