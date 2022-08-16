@@ -44,4 +44,24 @@ def show_all_workers() -> dict:
                 if line[ID_FIELD] == id_department:
                     result_dict[id_worker][DEPARTMENT_FIELD] = line[DEPARTMENT_FIELD]
                     break
-    return result_dict    
+    return result_dict
+
+def show_all_departments() -> dict:
+    if not os.path.isfile(DEPARTMENT_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    result_dict = {}
+    with open(DEPARTMENT_FILE_PATH, 'r', newline="") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
+        for line in csv_reader:
+            result_dict[line[ID_FIELD]] = OrderedDict({ID_FIELD: line[ID_FIELD], DEPARTMENT_FIELD: line[DEPARTMENT_FIELD]})
+    return result_dict
+
+def show_all_jobs():
+    if not os.path.isfile(JOBS_FILE_PATH):
+        raise FileNotFoundError(__name__, "BD files not found")
+    result_dict = {}
+    with open(JOBS_FILE_PATH, 'r', newline="") as csv_file:
+        csv_reader = csv.DictReader(csv_file, delimiter=CSV_DELIMITERS)
+        for line in csv_reader:
+            result_dict[line[ID_FIELD]] = OrderedDict({ID_FIELD: line[ID_FIELD], JOB_FIELD: line[JOB_FIELD]})
+    return result_dict
