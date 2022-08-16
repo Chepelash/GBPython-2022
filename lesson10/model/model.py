@@ -17,6 +17,9 @@ from telegram.ext import (
 
 import state_constants as sc
 import worker_menu as wm
+import dep_menu as dm
+import jobs_menu as jm
+
 
 CREDENTIALS_FILE = "credentials.txt"
 TOKEN_FIELD = "auth-token"
@@ -39,6 +42,8 @@ def init_bot() -> Update:
     #main menu
     select_menu_handlers = [
         wm.conv_handler,
+        dm.conv_handler,
+        jm.conv_handler,
         # dep_conv_handler,
         # jobs_conv_handler,
         CallbackQueryHandler(end, pattern='^'+sc.END+'$'),
@@ -62,8 +67,8 @@ def start(update: Update, context: CallbackContext):
     text = "Нажмите на кнопку для перехода в подменю"
     buttons = [
         [InlineKeyboardButton(text='операции с работниками', callback_data=wm.START_MENU)],
-        # [InlineKeyboardButton(text='операции с департаментами', callback_data=DEP_MENU)],
-        # [InlineKeyboardButton(text='операции с должностями', callback_data=JOBS_MENU)],
+        [InlineKeyboardButton(text='операции с департаментами', callback_data=dm.START_MENU)],
+        [InlineKeyboardButton(text='операции с должностями', callback_data=jm.START_MENU)],
         [InlineKeyboardButton(text='Закончить работу', callback_data=sc.END)],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
